@@ -1,0 +1,27 @@
+Meeting: OWU AI Workforce Committee
+Date: June 9, 2026
+Attendees: Khokon Barua, Professor Smith, Dean Johnson, Sarah Lee, Mike Chen
+
+Discussion Points:
+
+1. AI Policy Update
+Professor Smith presented the draft AI usage policy for students.
+The committee agreed that AI tools should be allowed for research but not for graded assignments.
+Dean Johnson emphasized the need for clear guidelines by September 2026.
+Sarah Lee suggested running student workshops to educate on responsible AI use.
+
+2. Robotics Club Budget
+Khokon Barua presented the robotics club budget request of $5,000 for the ATMAE competition.
+The committee approved $3,500 for equipment including LiDAR sensors and camera systems.
+Mike Chen requested a detailed spending breakdown by July 1st.
+
+3. AI Curriculum Integration
+The committee discussed adding an AI ethics course to the Computer Science curriculum.
+Professor Smith volunteered to design the course outline by August 2026.
+Dean Johnson will present the proposal to the academic board in September.
+
+4. Next Steps
+Sarah Lee will organize student AI awareness workshops in October.
+Khokon will submit robotics budget breakdown by July 1st.
+Professor Smith will complete AI ethics course outline by August 2026.
+Next meeting scheduled for July 15, 2026.
