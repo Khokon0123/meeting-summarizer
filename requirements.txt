@@ -1,3 +1,8 @@
-streamlit
-transformers
-torch
+langchain==0.3.30
+langchain-community==0.3.31
+langchain-core==0.3.86
+langchain-text-splitters==0.3.11
+langchain-ollama==0.3.10
+chromadb==1.5.9
+pypdf==6.12.2
+streamlit==1.50.0
