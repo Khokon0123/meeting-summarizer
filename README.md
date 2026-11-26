@@ -1,121 +1,98 @@
-# PDF Knowledge Base (RAG)
+# Meeting Notes Summarizer
 
-A chatbot that answers questions about your own PDF documents. It uses Retrieval-Augmented Generation (RAG): relevant passages are retrieved from your documents first, then a local LLaMA model writes an answer grounded in those passages. Everything runs on your own machine, so there are no API keys, no usage costs, and your documents never leave your computer.
+Paste meeting notes or upload a text file and get a short summary, a list of action items, and the attendees. Built with a pretrained DistilBART summarization model and a Streamlit interface.
 
-## Features
+**Live demo:** _add your link here after deploying_
 
-- Ask questions about one or many PDFs in natural language
-- Answers are grounded in your documents; the bot says so when the answer isn't in them
-- Every answer shows the exact source chunks it used
-- Chat interface with conversation history
-- Simple intent handling so greetings and small talk don't trigger document search
-- 100% local: LLaMA 3.2 runs through Ollama
+## What it does
+
+- Accepts meeting notes by pasting text or uploading a `.txt` file
+- Splits long notes into chunks so they fit the model's input limit, summarizes each chunk, and joins the results into one summary
+- Pulls out likely action items (lines with phrases like "will", "must", "needs to", "by", "deadline")
+- Detects attendees from an `Attendees:` line
+- Lets you download the summary and action items as a text file
 
 ## How it works
 
 ```
-Indexing (run once per set of PDFs)
-PDFs -> load pages -> split into 500-character chunks (50 overlap)
-     -> embed each chunk -> store vectors in ChromaDB
+Meeting notes -> split into ~1000-character chunks
+              -> summarize each chunk (sshleifer/distilbart-cnn-6-6)
+              -> combine into the final summary
 
-Answering (every question)
-Question -> embed -> find the 3 most similar chunks in ChromaDB
-         -> build a prompt with those chunks -> LLaMA 3.2 -> answer + sources
+Meeting notes -> keyword scan -> action items
+              -> "Attendees:" line -> attendee list
 ```
-
-The key idea: the model is never retrained on your documents. It is shown the most relevant passages right before it answers, like an open-book exam.
 
 ## Tech stack
 
 | Component | Tool |
 |---|---|
-| Orchestration | LangChain |
-| Vector database | ChromaDB |
-| LLM and embeddings | LLaMA 3.2 via Ollama |
-| PDF parsing | PyPDF |
+| Summarization model | sshleifer/distilbart-cnn-6-6 (Hugging Face Transformers) |
+| Runtime | PyTorch (CPU) |
 | Interface | Streamlit |
+| Hosting | Streamlit Community Cloud |
+
+DistilBART is a smaller, faster version of BART. It was chosen so the app fits within the memory limits of free hosting.
 
 ## Project structure
 
 ```
-rag-project/
-├── app.py             # Streamlit chat interface
-├── ingest.py          # Loads PDFs, chunks, embeds, stores in ChromaDB
-├── query.py           # Terminal version of the Q&A loop
-├── requirements.txt
-└── data/              # Put your PDFs here (not tracked by git)
+meeting-summarizer/
+├── app.py              # Streamlit interface
+├── summarizer.py       # Chunking, summarization, action items, attendees
+├── sample_meeting.txt  # Example notes to try
+└── requirements.txt
 ```
 
-## Setup
+## Run it locally
 
-Requires macOS or Linux, Python 3.9 or newer, and [Ollama](https://ollama.com).
-
-### 1. Install Ollama and pull the model
+Requires Python 3.11. Newer Python versions may not yet be supported by the model libraries.
 
 ```bash
-brew install ollama
-brew services start ollama
-ollama pull llama3.2
-```
-
-### 2. Clone the repo and create a virtual environment
-
-```bash
-git clone https://github.com/YOUR_USERNAME/rag-project.git
-cd rag-project
-python3 -m venv rag-env
-source rag-env/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
+git clone https://github.com/Khokon0123/Meeting-Notes-Summarizer.git
+cd Meeting-Notes-Summarizer
+python3.11 -m venv env
+source env/bin/activate
 pip install -r requirements.txt
-```
-
-### 4. Add your PDFs and build the index
-
-```bash
-mkdir -p data
-cp /path/to/your-document.pdf data/
-python3 ingest.py
-```
-
-`ingest.py` clears any previous index and rebuilds it from every PDF in `data/`. Run it again whenever you add or change documents.
-
-### 5. Run the app
-
-```bash
 streamlit run app.py
 ```
 
-The app opens at `http://localhost:8501`. You can also use the terminal version with `python3 query.py`.
+The first run downloads the model. After that it loads from your local cache.
 
-## Configuration
+## Example input
 
-Settings you can change in the code:
+```
+Meeting: Robotics Club
+Attendees: Alex, Jordan, Sam
 
-| Setting | Location | Default |
-|---|---|---|
-| Chunk size and overlap | `ingest.py` | 500 / 50 characters |
-| Chunks retrieved per question | `app.py`, `query.py` | 3 |
-| Model | `app.py`, `ingest.py`, `query.py` | `llama3.2` |
+We discussed the competition budget.
+Alex will submit the budget by July 1st.
+Jordan will order the sensors next week.
+Next meeting is July 15th.
+```
 
-Smaller chunks give more precise retrieval; larger chunks keep more context. Tune these against your own documents.
+Notes work best when each decision or task is written as its own line, and when attendees are listed on a line starting with `Attendees:`.
+
+## Privacy
+
+On the hosted demo, text you paste is processed on a remote server. Do not paste confidential or sensitive notes into it. To keep notes private, run the app locally as shown above; nothing leaves your computer.
 
 ## Limitations
 
-- Scanned PDFs that contain only images have no extractable text. Use PDFs with selectable text, or add OCR.
-- A small local model can miss details or phrase answers imperfectly, especially for questions that span many pages.
-- Embeddings use the same LLaMA model as generation, which works but is slower than a dedicated embedding model.
+- Action items come from keyword matching, not understanding. Some real tasks will be missed and some non-tasks will be included.
+- Action items are shown in lowercase because of how lines are processed.
+- The summary is built chunk by chunk, so very long notes can lose connections between sections.
+- The model is trained on news articles, so summaries of informal notes can be uneven.
+- Only plain text input is supported.
+- The hosted app goes to sleep after a period without visitors, so the first load can take a minute or two.
 
 ## Possible improvements
 
-- Upload PDFs directly in the interface
-- Use a dedicated embedding model and compare retrieval quality
-- Add reranking and hybrid keyword search
-- Evaluate retrieval precision on a labeled question set
+- Use an instruction-following language model to extract tasks with owners and deadlines
+- Support PDF and audio transcript input
+- Keep original capitalization in action items
+- Export to Markdown or PDF
 
 ## Skills demonstrated
 
-RAG pipeline design, text chunking, vector embeddings and semantic search, working with a vector database, running local LLMs, prompt design for grounded answers, and building a Streamlit application.
+Working with pretrained transformer models, handling input length limits through chunking, basic text extraction, trading model size against hosting limits, and building and deploying a Streamlit application.

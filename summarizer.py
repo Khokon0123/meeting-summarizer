@@ -1,7 +1,7 @@
 from transformers import pipeline
 
 print("Loading BART summarization model...")
-summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device=-1)
+summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-6-6", device=-1)
 print("Model loaded!")
 
 def chunk_text(text, max_chars=1000):
