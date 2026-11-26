@@ -49,8 +49,8 @@ meeting-summarizer/
 Requires Python 3.11. Newer Python versions may not yet be supported by the model libraries.
 
 ```bash
-git clone https://github.com/Khokon0123/Meeting-Notes-Summarizer.git
-cd Meeting-Notes-Summarizer
+git clone https://github.com/Khokon0123/meeting-summarizer.git
+cd meeting-summarizer
 python3.11 -m venv env
 source env/bin/activate
 pip install -r requirements.txt
