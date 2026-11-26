@@ -10,7 +10,7 @@ Paste meeting notes or upload a text file and get a short summary, a list of act
 - Splits long notes into chunks so they fit the model's input limit, summarizes each chunk, and joins the results into one summary
 - Pulls out likely action items (lines with phrases like "will", "must", "needs to", "by", "deadline")
 - Detects attendees from an `Attendees:` line
-- Lets you download the summary and action items as a text file
+- Lets you download the summary, action items, and attendees as a PDF, a Word file (opens in Google Docs), or plain text
 
 ## How it works
 
